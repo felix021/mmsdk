@@ -26,7 +26,7 @@ $w->reply("reply_cb");
 /* TODO */
 exit();
 
-function reply_cb($request)
+function reply_cb($request, $w)
 {
     if ($request['MsgType'] == "location")
         return "暂不支持位置服务。";
