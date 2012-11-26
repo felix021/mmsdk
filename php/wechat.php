@@ -67,7 +67,7 @@ class Wechat
 
     public function set_funcflag()
     {
-        $this->FuncFlag = true;
+        $this->funcflag = true;
     }
 
     public function replyText($message)
@@ -84,7 +84,7 @@ class Wechat
 eot;
         $req = $this->request;
         echo sprintf($textTpl, $req['FromUserName'], $req['ToUserName'],
-                time(), 'text', $message, $this->funflag ? 1 : 0);
+                time(), 'text', $message, $this->funcflag ? 1 : 0);
     }
 
     public function replyNews($arr_item)
