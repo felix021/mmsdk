@@ -29,7 +29,8 @@ exit();
 function reply_cb($request, $w)
 {
     if ($request['MsgType'] == "location") {
-        return sprintf("你的位置：(%s, %s)", $request['Location_X'], $request['Location_Y']);
+        return sprintf("你的位置：(%s, %s), 地址：%s",
+                $request['Location_X'], $request['Location_Y'], $request['Label']);
     }
 
     $content = trim($request['Content']);
