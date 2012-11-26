@@ -34,6 +34,10 @@ function reply_cb($request, $w)
     }
 
     $content = trim($request['Content']);
+    if ($content === "Hello2BizUser") { //貌似第一次加入会发送这个
+        return "你好!";
+    }
+
     if ($content !== "url") //发纯文本
     {
         //$w->set_funcflag(); //如果有必要的话，加星标，方便在web处理
