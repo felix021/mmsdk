@@ -28,8 +28,9 @@ exit();
 
 function reply_cb($request, $w)
 {
-    if ($request['MsgType'] == "location")
-        return "暂不支持位置服务。";
+    if ($request['MsgType'] == "location") {
+        return sprintf("你的位置：(%s, %s)", $request['Location_X'], $request['Location_Y']);
+    }
 
     $content = trim($request['Content']);
     if ($content !== "url") //发纯文本
