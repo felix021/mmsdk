@@ -3,15 +3,16 @@
 /*
     File: index.php
     Author: felix021@gmail.com
-    Date: 2012.11.26
+    Date: 2012.11.29
     Usage: 公众平台的请求入口 + 示例(验证+消息)
  */
 
+define("DEBUG", true);
 define("TOKEN", "TODO: Your Token Here");
 
 require_once(dirname(__FILE__) . "/wechat.php");
 
-$w = new Wechat(TOKEN);
+$w = new Wechat(TOKEN, DEBUG);
 
 //首次验证，验证过以后可以删掉
 if (isset($_GET['echostr'])) {
@@ -28,10 +29,15 @@ exit();
 
 function reply_cb($request, $w)
 {
-    if ($request['MsgType'] == "location") {
+    if ($w->get_msg_type() == "location") {
         return sprintf("你的位置：(%s, %s), 地址：%s",
                 $request['Location_X'], $request['Location_Y'], $request['Label']);
     }
+    else if ($w->get_msg_type() == "image") { //echo back url
+        $PicUrl = $request['PicUrl'];
+        return "图片url：" . $PicUrl;
+    }
+    //else: Text
 
     $content = trim($request['Content']);
     if ($content === "Hello2BizUser") { //貌似第一次加入会发送这个

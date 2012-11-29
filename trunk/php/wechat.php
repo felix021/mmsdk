@@ -3,9 +3,16 @@
 /*
     File: wechat.php
     Author: felix021@gmail.com
-    Date: 2012.11.26
+    Date: 2012.11.29
     Usage: api封装
     Comment: 
+        0. 初始化
+            (1) 调试模式 $w = new Wechat(TOKEN, true);
+                请求的数据会保存在当前目录的 request.txt
+                回复的数据会保存在当前目录的 response.txt
+
+            (2) 正常模式 $w = new Wechat(TOKEN);
+
         1. 验证api的时候，调用$w->valid()
 
         2. 处理用户请求，调用$w->valid(callback)
@@ -14,10 +21,14 @@
             (1) 数组，包含解析xml后得到的所有key, 同接口api文档，或参考后面的$req_keys
             (2) Wechat对象$w（用于分类星标）
 
-        2.2 分类为星标
+        2.2 判断请求类型： $w->get_msg_type()  //简单包装一下
+            类型目前有3种: "text" "location" "image"
+            详见样例.
+
+        2.3 分类为星标
             在callback函数中调用 $w->set_funcflag();
 
-        2.3 返回值（2种）
+        2.4 返回值（2种）
             (1) 字符串: 表示回复文本消息
                   [例]
                     function callback($request) {
@@ -43,17 +54,23 @@
 class Wechat
 {
     //似乎没什么用，放着用来自动完成吧。
-    static $req_keys = array("Content", "CreateTime", "FromUserName",
-        "Label", "Location_X", "Location_Y", "MsgType", "Scale", "ToUserName"
-    );
+    static $req_keys = array( "Content", "CreateTime", "FromUserName", "Label", 
+            "Location_X", "Location_Y", "MsgType", "PicUrl", "Scale", "ToUserName", );
     public $token;
     public $request = array();
 
     protected $funcflag = false;
+    protected $debug = false;
 
-    public function __construct($token)
+    public function __construct($token, $debug = false)
     {
         $this->token = $token;
+        $this->debug = $debug;
+    }
+
+    public function get_msg_type()
+    {
+        return strtolower($this->request['MsgType']);
     }
 
 	public function valid()
@@ -83,8 +100,9 @@ class Wechat
 </xml>
 eot;
         $req = $this->request;
-        echo sprintf($textTpl, $req['FromUserName'], $req['ToUserName'],
+        return sprintf($textTpl, $req['FromUserName'], $req['ToUserName'],
                 time(), 'text', $message, $this->funcflag ? 1 : 0);
+
     }
 
     public function replyNews($arr_item)
@@ -111,7 +129,7 @@ eot;
         $time = time();
         $fun = $this->funcflag ? 1 : 0;
 
-        echo <<<eot
+        return <<<eot
 <xml>
     <ToUserName><![CDATA[{$this->request['FromUserName']}]]></ToUserName>
     <FromUserName><![CDATA[{$this->request['ToUserName']}]]></FromUserName>
@@ -131,6 +149,8 @@ eot;
     {
 		//get post data, May be due to the different environments
 		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+        if ($debug)
+            file_put_contents("request.txt", $postStr);
 
         if(empty($postStr) || !$this->checkSignature())
             die("bad request");
@@ -140,9 +160,13 @@ eot;
         $arg = call_user_func($callback, $this->request, $this);
 
         if (!is_array($arg))
-            $this->replyText($arg);
+            $ret = $this->replyText($arg);
         else
-            $this->replyNews($arg);
+            $ret = $this->replyNews($arg);
+
+        if ($debug)
+            file_put_contents("response.txt", $ret);
+        echo $ret;
     }
 
 	private function checkSignature()
