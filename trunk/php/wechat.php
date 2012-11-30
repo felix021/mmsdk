@@ -3,7 +3,7 @@
 /*
     File: wechat.php
     Author: felix021@gmail.com
-    Date: 2012.11.29
+    Date: 2012.11.30
     Usage: api封装
     Comment: 
         0. 初始化
