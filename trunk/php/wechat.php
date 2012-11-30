@@ -149,7 +149,7 @@ eot;
     {
 		//get post data, May be due to the different environments
 		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
-        if ($debug)
+        if ($this->debug)
             file_put_contents("request.txt", $postStr);
 
         if(empty($postStr) || !$this->checkSignature())
@@ -164,7 +164,7 @@ eot;
         else
             $ret = $this->replyNews($arg);
 
-        if ($debug)
+        if ($this->debug)
             file_put_contents("response.txt", $ret);
         echo $ret;
     }
